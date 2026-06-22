@@ -217,3 +217,8 @@ deep-learning  machine-learning  analytics
 ---
 
 <p align="center">Dibuat dengan ❤️ menggunakan OpenCV & ONNX Runtime</p>
+
+#face-emotion-detection
+#faceemotiondetection
+#facemooddetection
+#facemooddetection
