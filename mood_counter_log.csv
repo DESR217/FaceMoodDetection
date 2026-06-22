@@ -1,24 +1,2 @@
 Waktu (WIB),Person ID,Emotion,Emosi,Confidence,Frames
-2026-06-07 23:07:12,0,neutral,Netral,0.9,10
-2026-06-07 23:07:42,0,happiness,Senang,1.0,10
-2026-06-07 23:08:36,0,surprise,Terkejut,0.6,10
-2026-06-07 23:09:59,0,sadness,Sedih,1.0,10
-2026-06-07 23:22:37,0,anger,Marah,0.9,10
-2026-06-08 08:24:47,0,neutral,Netral,1.0,10
-2026-06-08 08:24:51,1,happiness,Senang,0.9,10
-2026-06-08 08:35:42,0,neutral,Netral,0.9,10
-2026-06-08 08:35:48,0,neutral,Netral,0.9,10
-2026-06-08 08:35:52,0,happiness,Senang,1.0,10
-2026-06-08 08:35:55,0,surprise,Terkejut,1.0,10
-2026-06-08 08:36:00,0,neutral,Netral,1.0,10
-2026-06-08 14:23:24,4,neutral,Netral,1.0,10
-2026-06-08 14:23:34,8,neutral,Netral,0.6,10
-2026-06-08 14:23:56,11,neutral,Netral,1.0,10
-2026-06-08 14:24:07,14,neutral,Netral,0.9,10
-2026-06-08 14:24:10,13,neutral,Netral,0.7,10
-2026-06-08 14:24:29,16,neutral,Netral,0.8,10
-2026-06-08 14:24:37,17,neutral,Netral,0.9,10
-2026-06-08 14:25:50,19,sadness,Sedih,0.5,10
-2026-06-08 14:26:01,21,neutral,Netral,1.0,10
-2026-06-08 14:26:28,25,anger,Marah,0.6,10
-2026-06-08 14:26:39,28,happiness,Senang,0.9,10
+
