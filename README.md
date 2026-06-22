@@ -1,5 +1,204 @@
 # 🎭 Face Mood Counter — Real-time Emotion Analytics
 
+> Detect facial emotions in real time from a webcam, count how many people show each emotion, and stream the results straight to **Google Sheets** — **no TensorFlow**, lightweight, and easy to set up.
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.8%2B-green?logo=opencv&logoColor=white)
+![ONNX Runtime](https://img.shields.io/badge/ONNX%20Runtime-1.16%2B-orange?logo=onnx&logoColor=white)
+![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-Webhook-34A853?logo=google&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+---
+
+## 📖 About
+
+This app detects facial expressions from a camera in real time using **OpenCV** for capture & face detection, and the **ONNX `emotion-ferplus-8`** model to classify 8 emotions. Each detected person is counted **once** (via *centroid tracking*), and the tally is sent to **Google Sheets** through a Google Apps Script webhook — ideal for mood analytics in classrooms, events, or public spaces.
+
+Built entirely on **ONNX Runtime**, so it has no dependency on TensorFlow, which is often painful to install.
+
+---
+
+## ✨ Features
+
+- 🎥 **Real-time emotion detection** from webcam (8 emotion classes).
+- 👥 **Per-emotion people counter** with *centroid tracking* — each person counted once, not per frame.
+- 📊 **Real-time Google Sheets integration** via Apps Script webhook (`Log` + `Summary` tabs auto-created).
+- 🪶 **Lightweight & TensorFlow-free** — only `opencv-python`, `onnxruntime`, `numpy`.
+- 🎚️ **Live tuning** of emotion sensitivity while running (`[` / `]` keys).
+- 🖼️ **Separate stats panel** beside the video — never covers the face.
+- 💾 **Local CSV backup** so data is safe even if the webhook fails.
+- 🔄 **One-key reset** (`r`) for both the local panel and the Google Sheets tally.
+- 🌐 **Indonesian labels** by default (Netral, Senang, Terkejut, Sedih, Marah, Jijik, Takut, Sinis) — easily changeable.
+
+---
+
+## 🧠 How It Works
+
+```
+┌────────────┐   ┌──────────────────┐   ┌────────────────────┐   ┌──────────────┐
+│  Webcam    │ → │ OpenCV Haar       │ → │ ONNX emotion-       │ → │ Centroid     │
+│  (OpenCV)  │   │ Cascade (face)    │   │ ferplus-8 (emotion)│   │ Tracking (ID)│
+└────────────┘   └──────────────────┘   └────────────────────┘   └──────┬───────┘
+                                                                         │ 1 person = 1 count
+                                                                         ▼
+                                              ┌──────────────────────────────────┐
+                                              │ Webhook → Google Apps Script      │
+                                              │ → Google Sheets (Log + Summary)   │
+                                              └──────────────────────────────────┘
+```
+
+1. Faces are detected each frame, square-cropped + histogram-equalized so expressions read more clearly.
+2. The ONNX model outputs probabilities for 8 emotions (with a "Neutral" bias compensation).
+3. Each face gets an ID; once stable for a few frames, the person is counted once using their dominant emotion.
+4. The event is pushed to Google Sheets and logged to a local CSV.
+
+---
+
+## 🗂️ Project Structure
+
+| File | Description |
+|------|-------------|
+| `face_mood_counter_gsheet.py` | **Main app** — counter + Google Sheets integration |
+| `face_mood_detection_onnx.py` | Standalone emotion detection (no counter / Sheets) |
+| `AppsScript_Code.gs` | Google Apps Script code (webhook receiver) |
+| `requirements_onnx.txt` | Python dependencies |
+| `models/emotion-ferplus-8.onnx` | Emotion model (auto-downloaded on first run) |
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+- Python **3.10 – 3.13** (64-bit)
+- A webcam
+- Internet connection (once, to download the ~35 MB model)
+
+### Steps
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/DESR217/face-mood-counter.git
+cd face-mood-counter
+
+# 2. (Recommended) create a virtual environment
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS / Linux
+source venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements_onnx.txt
+
+# 4. Run
+python face_mood_counter_gsheet.py
+```
+
+> 💡 **In PyCharm:** create a new project with a Python 3.10–3.13 interpreter, add the files to the project folder, run `pip install -r requirements_onnx.txt` in the Terminal, then click **Run**.
+
+---
+
+## 📑 Google Sheets Setup (optional — for online counting)
+
+1. Open **[sheets.new](https://sheets.new)** to create a new Google Sheet (the `Log` & `Summary` tabs are created automatically).
+2. In that sheet: **Extensions → Apps Script**.
+3. Delete the contents of `Code.gs`, paste the entire **`AppsScript_Code.gs`**, then **Save**.
+4. **Deploy → New deployment → Web app**:
+   - *Execute as:* **Me**
+   - *Who has access:* **Anyone**
+5. Copy the **Web app URL** and paste it into the `APPS_SCRIPT_URL` variable in `face_mood_counter_gsheet.py`:
+
+```python
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/XXXX/exec"
+```
+
+> 🔒 **Security note:** *Anyone* access is required so the webhook can receive data without login. Don't share the URL publicly. For production, add a secret token on both sides.
+
+If `APPS_SCRIPT_URL` is left empty, the app still runs in **local mode** (counting + CSV only).
+
+---
+
+## ⌨️ Keyboard Controls
+
+| Key | Action |
+|:---:|--------|
+| `q` | Quit the app |
+| `s` | Save a screenshot |
+| `r` | Reset counter (local panel **+** Summary tab in Sheets) |
+| `[` | Lower Neutral compensation (other emotions surface more easily) |
+| `]` | Raise Neutral compensation |
+
+---
+
+## ⚙️ Configuration
+
+Set these at the top of `face_mood_counter_gsheet.py`:
+
+| Parameter | Default | Description |
+|-----------|:-------:|-------------|
+| `CAM_INDEX` | `0` | Webcam index (try 1/2 if not detected) |
+| `APPS_SCRIPT_URL` | `""` | Apps Script Web App URL (empty = local mode) |
+| `CONFIRM_FRAMES` | `10` | Stable frames before a person is counted |
+| `NEUTRAL_PENALTY` | `0.50` | Neutral-bias suppressor (1.0 = off) |
+| `FACE_MARGIN` | `0.25` | Face crop margin |
+| `MIN_FACE` | `80` | Minimum face size (px) |
+| `MAX_DISAPPEARED` | `40` | Frames to tolerate a briefly lost face |
+| `MAX_DISTANCE` | `140` | Max px distance to match faces across frames |
+
+---
+
+## 😀 Emotion Classes
+
+| Model (EN) | Display label (ID) |
+|------------|--------------------|
+| neutral | Netral |
+| happiness | Senang |
+| surprise | Terkejut |
+| sadness | Sedih |
+| anger | Marah |
+| disgust | Jijik |
+| fear | Takut |
+| contempt | Sinis |
+
+Model: [`emotion-ferplus-8`](https://huggingface.co/onnxmodelzoo/emotion-ferplus-8) (ONNX Model Zoo), grayscale 64×64 input, ~35 MB. The on-screen labels are Indonesian by default — edit the `EMOTIONS` list to change them.
+
+---
+
+## ⚠️ Limitations
+
+- **Neutral bias:** the FER+ model was trained on FER2013 and tends to pick "Neutral". This is compensated (square crop, histogram equalization, neutral penalty) but not perfect for subtle expressions.
+- **Face detection:** Haar cascade is less accurate on tilted faces / poor lighting.
+- **Position-based tracking, not face recognition:** a person who **leaves and re-enters** the frame is counted as a new person. Two faces that cross and overlap may swap IDs.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Upgrade face detection to **YuNet** (`cv2.FaceDetectorYN`) for better accuracy.
+- [ ] **Face recognition** (ONNX embeddings) so the same person isn't double-counted over time.
+- [ ] Secret token to secure the webhook.
+- [ ] Visual dashboard (emotion-trend charts from Sheets data).
+
+---
+
+## 🛠️ Tech Stack
+
+`Python` · `OpenCV` · `ONNX Runtime` · `NumPy` · `Google Apps Script` · `Google Sheets`
+
+---
+
+## 📄 License
+
+Released under the **MIT** License. Free to use, modify, and distribute.
+
+
+
+<p align="center">Built with ❤️ using OpenCV & ONNX Runtime</p>
+
+---
+
+# 🎭 Face Mood Counter — Real-time Emotion Analytics
+
 > Deteksi emosi wajah secara real-time dari webcam, hitung jumlah orang per emosi, dan kirim hasilnya ke **Google Sheets** secara langsung — **tanpa TensorFlow**, ringan, dan mudah dipasang.
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
