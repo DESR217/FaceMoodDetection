@@ -197,6 +197,8 @@ Released under the **MIT** License. Free to use, modify, and distribute.
 
 ---
 
+In Bahasa
+
 # 🎭 Face Mood Counter — Real-time Emotion Analytics
 
 > Deteksi emosi wajah secara real-time dari webcam, hitung jumlah orang per emosi, dan kirim hasilnya ke **Google Sheets** secara langsung — **tanpa TensorFlow**, ringan, dan mudah dipasang.
