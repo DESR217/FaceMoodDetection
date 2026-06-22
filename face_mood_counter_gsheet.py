@@ -40,7 +40,7 @@ CAM_INDEX = 0
 
 # >>> ISI dengan URL Web App Apps Script (lihat AppsScript_Code.gs).
 # Kosongkan ("") untuk jalan tanpa Sheets (tetap hitung + simpan CSV lokal).
-APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDv_85klYz7Np5NiqAldBFeCk41YGdokIO2X2hRgZa3ZtEevnzyrVO-aXAUl3FVSE/exec"
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/XXX/exec"
 
 CONFIRM_FRAMES = 10      # frame stabil sebelum 1 orang dihitung (cukup utk tangkap ekspresi)
 FACE_MARGIN = 0.25
